@@ -287,7 +287,7 @@
             <div class="stat-sub">Receitas − Despesas − Invest.</div>
           </div>
         </div>
-        <div class="grid-2" style="align-items:start;gap:20px;">
+        <div class="grid-3" style="align-items:start;gap:20px;">
           <div class="card">
             <div class="card-header"><div class="card-title">Receitas por Tipo</div><span class="card-badge" id="ctrlReceitasBadge">—</span></div>
             <div class="table-wrap">
@@ -316,6 +316,27 @@
               </table>
             </div>
           </div>
+          <!-- ══ RESUMO POR TIPO ══ -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Resumo por Tipo</div>
+              <div class="flex-gap">
+                <span class="card-badge" id="ctrlResumoBadge">—</span>
+              </div>
+            </div>
+            <div class="text-muted" style="font-size:.76rem;padding:0 16px 10px;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
+            <div class="table-wrap">
+              <table id="ctrlResumoTable">
+                <thead><tr>
+                  <th>Tipo / Origem</th>
+                  <th style="text-align:right;">Entradas</th>
+                  <th style="text-align:right;">Saídas</th>
+                  <th style="text-align:right;">Saldo</th>
+                </tr></thead>
+                <tbody id="ctrlResumoBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
         <div class="card" style="margin-top:20px;">
           <div class="card-header">
@@ -336,27 +357,6 @@
                 <th class="no-sort">Natureza</th>
               </tr></thead>
               <tbody id="ctrlBody"></tbody>
-            </table>
-          </div>
-        </div>
-        <!-- ══ RESUMO POR ORIGEM ══ -->
-        <div class="card" style="margin-top:20px;">
-          <div class="card-header">
-            <div class="card-title">Resumo por Tipo</div>
-            <div class="flex-gap">
-              <span class="card-badge" id="ctrlResumoBadge">—</span>
-              <div class="text-muted" style="font-size:.76rem;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table id="ctrlResumoTable">
-              <thead><tr>
-                <th>Tipo / Origem</th>
-                <th style="text-align:right;">Entradas</th>
-                <th style="text-align:right;">Saídas</th>
-                <th style="text-align:right;">Saldo</th>
-              </tr></thead>
-              <tbody id="ctrlResumoBody"></tbody>
             </table>
           </div>
         </div>
