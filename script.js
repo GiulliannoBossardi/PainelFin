@@ -3,7 +3,7 @@
 ════════════════════════════════════════════ */
 const DB={
   get(k){try{return JSON.parse(localStorage.getItem('fp_'+k));}catch{return null;}},
-  set(k,v){localStorage.setItem('fp_'+k,JSON.stringify(v));},
+  set(k,v){try{localStorage.setItem('fp_'+k,JSON.stringify(v));}catch(e){console.warn('localStorage indisponível:',e);}},
   init(){
     if(!this.get('salarios'))    this.set('salarios',[]);
     if(!this.get('extras'))      this.set('extras',[]);
@@ -72,7 +72,13 @@ function fazerLogin(){
   const nome=document.getElementById('loginUser').value.trim();
   const senha=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
-  const user=(DB.get('usuarios')||[]).find(u=>u.nome.toLowerCase()===nome.toLowerCase()&&u.senha===senha);
+  /* Garante que os usuários padrão existam mesmo se o localStorage falhar */
+  let usuarios=DB.get('usuarios');
+  if(!usuarios||!Array.isArray(usuarios)||usuarios.length===0){
+    usuarios=[{id:1,nome:'Administrador',perfil:'admin',senha:'admin123'}];
+    try{DB.set('usuarios',usuarios);}catch(e){}
+  }
+  const user=usuarios.find(u=>u.nome.toLowerCase()===nome.toLowerCase()&&u.senha===senha);
   if(!user){err.classList.add('visible');document.getElementById('loginPass').value='';return;}
   err.classList.remove('visible');
   currentUser=user;
