@@ -3,7 +3,7 @@
 ════════════════════════════════════════════ */
 const DB={
   get(k){try{return JSON.parse(localStorage.getItem('fp_'+k));}catch{return null;}},
-  set(k,v){try{localStorage.setItem('fp_'+k,JSON.stringify(v));}catch(e){console.warn('localStorage indisponível:',e);}},
+  set(k,v){localStorage.setItem('fp_'+k,JSON.stringify(v));},
   init(){
     if(!this.get('salarios'))    this.set('salarios',[]);
     if(!this.get('extras'))      this.set('extras',[]);
@@ -72,13 +72,7 @@ function fazerLogin(){
   const nome=document.getElementById('loginUser').value.trim();
   const senha=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
-  /* Garante que os usuários padrão existam mesmo se o localStorage falhar */
-  let usuarios=DB.get('usuarios');
-  if(!usuarios||!Array.isArray(usuarios)||usuarios.length===0){
-    usuarios=[{id:1,nome:'Administrador',perfil:'admin',senha:'admin123'}];
-    try{DB.set('usuarios',usuarios);}catch(e){}
-  }
-  const user=usuarios.find(u=>u.nome.toLowerCase()===nome.toLowerCase()&&u.senha===senha);
+  const user=(DB.get('usuarios')||[]).find(u=>u.nome.toLowerCase()===nome.toLowerCase()&&u.senha===senha);
   if(!user){err.classList.add('visible');document.getElementById('loginPass').value='';return;}
   err.classList.remove('visible');
   currentUser=user;
@@ -800,7 +794,13 @@ function renderCtrlResumoOrigem(){
   const totEntradas=rows.reduce((s,r)=>s+r.entradas,0);
   const totSaidas=rows.reduce((s,r)=>s+r.saidas,0);
   tbody.innerHTML+=`<tr class="ctrl-total-row"><td style="font-size:.82rem;">Total</td><td style="text-align:right;" class="td-value-income">${Fmt.brl(totEntradas)}</td><td style="text-align:right;" class="td-value-expense">−${Fmt.brl(totSaidas)}</td><td style="text-align:right;"><span class="${totSaldoClass}" style="font-weight:700;">${totSaldoStr}</span></td></tr>`;
-}if(ctrlMainSortSt.col===col)ctrlMainSortSt.dir*=-1;else{ctrlMainSortSt.col=col;ctrlMainSortSt.dir=1;}document.getElementById('ctrlTable').querySelectorAll('thead th').forEach(th=>{th.classList.toggle('sorted',th.dataset.col===col);if(th.querySelector('.sort-icon'))th.querySelector('.sort-icon').textContent=th.dataset.col===col?(ctrlMainSortSt.dir===1?'↑':'↓'):'↕';});renderCtrlTable();}
+}
+
+function sortCtrlMain(col){
+  if(ctrlMainSortSt.col===col)ctrlMainSortSt.dir*=-1;else{ctrlMainSortSt.col=col;ctrlMainSortSt.dir=1;}
+  document.getElementById('ctrlTable').querySelectorAll('thead th').forEach(th=>{th.classList.toggle('sorted',th.dataset.col===col);if(th.querySelector('.sort-icon'))th.querySelector('.sort-icon').textContent=th.dataset.col===col?(ctrlMainSortSt.dir===1?'↑':'↓'):'↕';});
+  renderCtrlTable();
+}
 
 function renderCtrlTable(){
   const tbody=document.getElementById('ctrlBody');
