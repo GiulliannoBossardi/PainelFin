@@ -565,31 +565,52 @@ function getInvestRows(ano,ref){
   return rows;
 }
 
+function onInvestOperacaoChange(){
+  const op=document.getElementById('investOperacao').value;
+  const isRetirada=op==='retirada';
+  document.getElementById('investValorLabel').textContent=isRetirada?'Valor Retirado':'Valor Aportado';
+  const btn=document.getElementById('investBtnConfirmar');
+  btn.style.background=isRetirada?'var(--expense)':'var(--invest)';
+  document.getElementById('investBtnLabel').textContent=isRetirada?'Confirmar Retirada':'Confirmar Aporte';
+}
+
 function sortInvest(col){if(investSortSt.col===col)investSortSt.dir*=-1;else{investSortSt.col=col;investSortSt.dir=1;}document.getElementById('investTable').querySelectorAll('thead th').forEach(th=>{th.classList.toggle('sorted',th.dataset.col===col);if(th.querySelector('.sort-icon'))th.querySelector('.sort-icon').textContent=th.dataset.col===col?(investSortSt.dir===1?'↑':'↓'):'↕';});renderInvestTable();}
 
 function renderInvestTable(){
   const tbody=document.getElementById('investBody');
   const srch=(document.getElementById('filterInvest').value||'').toLowerCase();
   let rows=getInvestRows(filtroAno,filtroRef);
-  if(srch)rows=rows.filter(r=>Fmt.ref(r.ref).toLowerCase().includes(srch)||(r.tipo||'').toLowerCase().includes(srch)||(r.descricao||'').toLowerCase().includes(srch));
+  if(srch)rows=rows.filter(r=>Fmt.ref(r.ref).toLowerCase().includes(srch)||(r.tipo||'').toLowerCase().includes(srch)||(r.descricao||'').toLowerCase().includes(srch)||(r.operacao||'aporte').toLowerCase().includes(srch));
   const{col,dir}=investSortSt;
-  rows.sort((a,b)=>{let av,bv;if(col==='ref')av=a.ref,bv=b.ref;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.ref,bv=b.ref;return av<bv?-dir:av>bv?dir:0;});
+  rows.sort((a,b)=>{let av,bv;if(col==='ref')av=a.ref,bv=b.ref;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='operacao')av=a.operacao||'aporte',bv=b.operacao||'aporte';else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.ref,bv=b.ref;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('investBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
-  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="5">Nenhum aporte registrado.</td></tr>`;return;}
-  tbody.innerHTML=rows.map(r=>`<tr><td class="td-ref">${Fmt.ref(r.ref)}</td><td><span class="td-tag">${r.tipo||'—'}</span></td><td style="font-size:.84rem;">${r.descricao||'—'}</td><td style="font-family:var(--font-mono);font-weight:500;color:var(--invest);">${Fmt.brl(r.valor)}</td><td><div class="actions-cell"><button class="btn-icon danger" onclick="pedirExcluirInvest('${r.id}')" title="Excluir">✕</button></div></td></tr>`).join('');
+  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Nenhum registro encontrado.</td></tr>`;return;}
+  tbody.innerHTML=rows.map(r=>{
+    const op=r.operacao||'aporte';
+    const isRetirada=op==='retirada';
+    const opBadge=isRetirada
+      ?`<span class="nature-badge despesa">📉 Retirada</span>`
+      :`<span class="nature-badge receita">📈 Aporte</span>`;
+    const valClass=isRetirada?'td-value-expense':'td-value-invest';
+    return`<tr><td class="td-ref">${Fmt.ref(r.ref)}</td><td>${opBadge}</td><td><span class="td-tag">${r.tipo||'—'}</span></td><td style="font-size:.84rem;">${r.descricao||'—'}</td><td style="font-family:var(--font-mono);font-weight:500;" class="${valClass}">${isRetirada?'−':''}${Fmt.brl(r.valor)}</td><td><div class="actions-cell"><button class="btn-icon danger" onclick="pedirExcluirInvest('${r.id}')" title="Excluir">✕</button></div></td></tr>`;
+  }).join('');
 }
 
 function atualizarStatsInvest(){
   const rowsFiltro=getInvestRows(filtroAno,filtroRef);
   const allRows=DB.get('investimentos')||[];
-  const tipos=[...new Set(allRows.map(r=>r.tipo).filter(Boolean))];
-  document.getElementById('investStatTotal').textContent=Fmt.brl(rowsFiltro.reduce((s,r)=>s+r.valor,0));
-  document.getElementById('investStatPatrimonio').textContent=Fmt.brl(allRows.reduce((s,r)=>s+r.valor,0));
-  document.getElementById('investStatTipos').textContent=tipos.length||'—';
+  const totalAportes=rowsFiltro.filter(r=>(r.operacao||'aporte')==='aporte').reduce((s,r)=>s+r.valor,0);
+  const totalRetiradas=rowsFiltro.filter(r=>r.operacao==='retirada').reduce((s,r)=>s+r.valor,0);
+  const patrimonioLiquido=allRows.filter(r=>(r.operacao||'aporte')==='aporte').reduce((s,r)=>s+r.valor,0)
+                         -allRows.filter(r=>r.operacao==='retirada').reduce((s,r)=>s+r.valor,0);
+  document.getElementById('investStatTotal').textContent=Fmt.brl(totalAportes);
+  document.getElementById('investStatRetiradas').textContent=Fmt.brl(totalRetiradas);
+  document.getElementById('investStatPatrimonio').textContent=Fmt.brl(patrimonioLiquido);
 }
 
 function confirmarInsercaoInvest(){
   const ref=document.getElementById('investRef').value;
+  const operacao=document.getElementById('investOperacao').value;
   const tipo=document.getElementById('investTipo').value;
   const descricao=document.getElementById('investDescricao').value.trim();
   const valor=Fmt.parse(document.getElementById('investValor').value);
@@ -597,16 +618,19 @@ function confirmarInsercaoInvest(){
   if(!tipo){Toast.show('Selecione o tipo de investimento','error');return;}
   if(!valor){Toast.show('Informe o valor','error');return;}
   const inv=DB.get('investimentos')||[];
-  inv.push({id:Fmt.uid(),ref,tipo,descricao,valor});
+  inv.push({id:Fmt.uid(),ref,operacao,tipo,descricao,valor});
   DB.set('investimentos',inv);
   ['investRef','investDescricao','investValor'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('investOperacao').value='aporte';
+  onInvestOperacaoChange();
   reconstruirFiltros();renderInvestTable();atualizarStatsInvest();renderControle();
-  Toast.show(`Aporte de ${Fmt.brl(valor)} em ${tipo} registrado`,'success');
+  const label=operacao==='retirada'?'Retirada':'Aporte';
+  Toast.show(`${label} de ${Fmt.brl(valor)} em ${tipo} registrado`,'success');
 }
 
 let pendingDeleteInvestId=null;
-function pedirExcluirInvest(id){const r=(DB.get('investimentos')||[]).find(x=>x.id===id);if(!r)return;pendingDeleteInvestId=id;document.getElementById('deleteInvestDesc').textContent=`${r.tipo} — ${Fmt.brl(r.valor)} (${Fmt.ref(r.ref)})`;document.getElementById('modalExcluirInvest').classList.remove('hidden');}
-function confirmarExclusaoInvest(){DB.set('investimentos',(DB.get('investimentos')||[]).filter(r=>r.id!==pendingDeleteInvestId));closeModal('modalExcluirInvest');pendingDeleteInvestId=null;reconstruirFiltros();renderInvestTable();atualizarStatsInvest();renderControle();Toast.show('Aporte excluído','error');}
+function pedirExcluirInvest(id){const r=(DB.get('investimentos')||[]).find(x=>x.id===id);if(!r)return;pendingDeleteInvestId=id;const op=r.operacao==='retirada'?'Retirada':'Aporte';document.getElementById('deleteInvestDesc').textContent=`${op}: ${r.tipo} — ${Fmt.brl(r.valor)} (${Fmt.ref(r.ref)})`;document.getElementById('modalExcluirInvest').classList.remove('hidden');}
+function confirmarExclusaoInvest(){DB.set('investimentos',(DB.get('investimentos')||[]).filter(r=>r.id!==pendingDeleteInvestId));closeModal('modalExcluirInvest');pendingDeleteInvestId=null;reconstruirFiltros();renderInvestTable();atualizarStatsInvest();renderControle();Toast.show('Registro excluído','error');}
 
 /* ════════════════════════════════════════════
    ABA CONTROLE
@@ -655,7 +679,8 @@ function renderControle(){
   const totalDespesas=linhas.filter(l=>l.natureza==='despesa').reduce((s,l)=>s+l.valor,0);
   /* Investimentos no período */
   const investRows=getInvestRows(filtroAno,filtroRef);
-  const totalInvest=investRows.reduce((s,r)=>s+r.valor,0);
+  const totalInvest=investRows.filter(r=>(r.operacao||'aporte')==='aporte').reduce((s,r)=>s+r.valor,0)
+                  -investRows.filter(r=>r.operacao==='retirada').reduce((s,r)=>s+r.valor,0);
   const saldo=totalReceitas-totalDespesas-totalInvest;
 
   document.getElementById('ctrlStatReceitas').textContent=Fmt.brl(totalReceitas);
