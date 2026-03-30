@@ -271,6 +271,7 @@ function renderSalarioTable(){
   const{col,dir}=sortSt.salario;
   rows.sort((a,b)=>{const av=col==='ref'?a.ref:(a[col]||0),bv=col==='ref'?b.ref:(b[col]||0);return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('salarioBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
+  atualizarStats();
   if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Nenhum registro encontrado.</td></tr>`;return;}
   tbody.innerHTML=rows.map(r=>r.ref===editingSalRef?buildSalEditRow(r):buildSalReadRow(r)).join('');
 }
@@ -291,6 +292,7 @@ function renderExtrasTable(){
   const{col,dir}=sortSt.extras;
   rows.sort((a,b)=>{const av=col==='ref'?a.ref:col==='liquido'?a.liquido:col==='bruto'?a.bruto:a.tipo,bv=col==='ref'?b.ref:col==='liquido'?b.liquido:col==='bruto'?b.bruto:b.tipo;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('extrasBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
+  atualizarStats();
   if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="5">Nenhum extra registrado.</td></tr>`;return;}
   const criterios=DB.get('criterios')||[];
   tbody.innerHTML=rows.map(r=>r.id===editingExtraId?buildExtEditRow(r,criterios):buildExtReadRow(r)).join('');
@@ -339,7 +341,18 @@ function confirmarInsercaoSalario(){
 }
 
 /* Stats Salário */
-function atualizarStats(){const rows=getSalRows(filtroAno,filtroRef);let ext=DB.get('extras')||[];if(filtroRef)ext=ext.filter(e=>e.ref===filtroRef);else if(filtroAno)ext=ext.filter(e=>e.ref.startsWith(filtroAno+'-'));document.getElementById('statLiquido').textContent=Fmt.brl(rows.reduce((s,r)=>s+r.liquido,0));document.getElementById('statBruto').textContent=Fmt.brl(rows.reduce((s,r)=>s+r.bruto,0));document.getElementById('statExtras').textContent=Fmt.brl(ext.reduce((s,r)=>s+(r.liquido||0),0));}
+function atualizarStats(){
+  const srchSal=(document.getElementById('filterSalario')?document.getElementById('filterSalario').value:'').toLowerCase();
+  const srchExt=(document.getElementById('filterExtras')?document.getElementById('filterExtras').value:'').toLowerCase();
+  let rows=getSalRows(filtroAno,filtroRef);
+  if(srchSal)rows=rows.filter(r=>Fmt.ref(r.ref).toLowerCase().includes(srchSal));
+  let ext=DB.get('extras')||[];
+  if(filtroRef)ext=ext.filter(e=>e.ref===filtroRef);else if(filtroAno)ext=ext.filter(e=>e.ref.startsWith(filtroAno+'-'));
+  if(srchExt)ext=ext.filter(r=>Fmt.ref(r.ref).toLowerCase().includes(srchExt)||r.tipo.toLowerCase().includes(srchExt));
+  document.getElementById('statLiquido').textContent=Fmt.brl(rows.reduce((s,r)=>s+r.liquido,0));
+  document.getElementById('statBruto').textContent=Fmt.brl(rows.reduce((s,r)=>s+r.bruto,0));
+  document.getElementById('statExtras').textContent=Fmt.brl(ext.reduce((s,r)=>s+(r.liquido||0),0));
+}
 
 /* ════════════════════════════════════════════
    ABA SAÍDAS
@@ -375,6 +388,7 @@ function renderSaidasTable(){
   const{col,dir}=saidaSortSt;
   rows.sort((a,b)=>{let av,bv;if(col==='ref')av=a.parcelaRef,bv=b.parcelaRef;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.parcelaRef,bv=b.parcelaRef;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('saidaBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
+  atualizarStatsSaida();
   if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">Nenhuma saída registrada.</td></tr>`;return;}
   const tipos=DB.get('tiposConta')||[];
   tbody.innerHTML=rows.map(r=>{
@@ -424,7 +438,9 @@ function toggleStatus(id,parcelaIdx){
 }
 
 function atualizarStatsSaida(){
-  const rows=expandirSaidas(DB.get('saidas')||[],filtroAno,filtroRef);
+  const srch=(document.getElementById('filterSaida')?document.getElementById('filterSaida').value:'').toLowerCase();
+  let rows=expandirSaidas(DB.get('saidas')||[],filtroAno,filtroRef);
+  if(srch)rows=rows.filter(r=>(r.descricao||'').toLowerCase().includes(srch)||(r.tipo||'').toLowerCase().includes(srch)||Fmt.ref(r.parcelaRef).toLowerCase().includes(srch));
   let total=0,pendente=0,pago=0;
   rows.forEach(r=>{total+=r.valorExib;const key=r._parcelaIdx==='av'?'av':parseInt(r._parcelaIdx);const pg=(r.pagos||{})[key]||false;if(pg)pago+=r.valorExib;else pendente+=r.valorExib;});
   document.getElementById('saidaStatTotal').textContent=Fmt.brl(total);
@@ -488,6 +504,7 @@ function renderEntradasTable(){
   const{col,dir}=entradaSortSt;
   rows.sort((a,b)=>{let av,bv;if(col==='ref')av=a.parcelaRef,bv=b.parcelaRef;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.parcelaRef,bv=b.parcelaRef;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('entradaBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
+  atualizarStatsEntrada();
   if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">Nenhuma entrada registrada.</td></tr>`;return;}
   const tipos=DB.get('tiposConta')||[];
   tbody.innerHTML=rows.map(r=>{
@@ -528,7 +545,9 @@ function toggleStatusEntrada(id,parcelaIdx){
 }
 
 function atualizarStatsEntrada(){
-  const rows=expandirEntradas(DB.get('entradas')||[],filtroAno,filtroRef);
+  const srch=(document.getElementById('filterEntrada')?document.getElementById('filterEntrada').value:'').toLowerCase();
+  let rows=expandirEntradas(DB.get('entradas')||[],filtroAno,filtroRef);
+  if(srch)rows=rows.filter(r=>(r.descricao||'').toLowerCase().includes(srch)||(r.tipo||'').toLowerCase().includes(srch)||Fmt.ref(r.parcelaRef).toLowerCase().includes(srch));
   let total=0,pendente=0,pago=0;
   rows.forEach(r=>{total+=r.valorExib;const key=r._parcelaIdx==='av'?'av':parseInt(r._parcelaIdx);const pg=(r.pagos||{})[key]||false;if(pg)pago+=r.valorExib;else pendente+=r.valorExib;});
   document.getElementById('entradaStatTotal').textContent=Fmt.brl(total);
@@ -584,6 +603,7 @@ function renderInvestTable(){
   const{col,dir}=investSortSt;
   rows.sort((a,b)=>{let av,bv;if(col==='ref')av=a.ref,bv=b.ref;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='operacao')av=a.operacao||'aporte',bv=b.operacao||'aporte';else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.ref,bv=b.ref;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('investBadge').textContent=rows.length+' registro'+(rows.length!==1?'s':'');
+  atualizarStatsInvest();
   if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Nenhum registro encontrado.</td></tr>`;return;}
   tbody.innerHTML=rows.map(r=>{
     const op=r.operacao||'aporte';
@@ -597,7 +617,9 @@ function renderInvestTable(){
 }
 
 function atualizarStatsInvest(){
-  const rowsFiltro=getInvestRows(filtroAno,filtroRef);
+  const srch=(document.getElementById('filterInvest')?document.getElementById('filterInvest').value:'').toLowerCase();
+  let rowsFiltro=getInvestRows(filtroAno,filtroRef);
+  if(srch)rowsFiltro=rowsFiltro.filter(r=>Fmt.ref(r.ref).toLowerCase().includes(srch)||(r.tipo||'').toLowerCase().includes(srch)||(r.descricao||'').toLowerCase().includes(srch)||(r.operacao||'aporte').toLowerCase().includes(srch));
   const allRows=DB.get('investimentos')||[];
   const totalAportes=rowsFiltro.filter(r=>(r.operacao||'aporte')==='aporte').reduce((s,r)=>s+r.valor,0);
   const totalRetiradas=rowsFiltro.filter(r=>r.operacao==='retirada').reduce((s,r)=>s+r.valor,0);
@@ -693,6 +715,7 @@ function renderControle(){
   renderCtrlGrupo('receitas',agruparPorTipo(linhas,'receita'),totalReceitas,'receita');
   renderCtrlGrupo('despesas',agruparPorTipo(linhas,'despesa'),totalDespesas,'despesa');
   renderCtrlTable();
+  renderCtrlResumoOrigem();
 }
 
 function sortCtrl(tabela,col){
@@ -716,7 +739,62 @@ function renderCtrlGrupo(tabela,grupos,grandTotal,natureza){
   tbody.innerHTML=rows+totalRow;
 }
 
-function sortCtrlMain(col){if(ctrlMainSortSt.col===col)ctrlMainSortSt.dir*=-1;else{ctrlMainSortSt.col=col;ctrlMainSortSt.dir=1;}document.getElementById('ctrlTable').querySelectorAll('thead th').forEach(th=>{th.classList.toggle('sorted',th.dataset.col===col);if(th.querySelector('.sort-icon'))th.querySelector('.sort-icon').textContent=th.dataset.col===col?(ctrlMainSortSt.dir===1?'↑':'↓'):'↕';});renderCtrlTable();}
+function renderCtrlResumoOrigem(){
+  const linhas=getLinhasCtrl(filtroAno,filtroRef);
+  /* Apply main table search filter too */
+  const srch=(document.getElementById('filterCtrl')?document.getElementById('filterCtrl').value:'').toLowerCase();
+
+  /* Build map of "tipo/origem" -> {entradas, saidas} */
+  /* We treat each unique "tipo" as a category. For receitas we look at the tipo.
+     For despesas we also use tipo. We need to cross-reference so we can show a unified list. */
+
+  /* Collect all unique tipos across both receitas and despesas */
+  const tipos=new Set();
+  linhas.forEach(l=>{
+    /* Use the descricao's "origin" which is the tipo field */
+    tipos.add(l.tipo);
+  });
+
+  const resumo={};
+  linhas.forEach(l=>{
+    const t=l.tipo;
+    if(!resumo[t])resumo[t]={tipo:t,entradas:0,saidas:0};
+    if(l.natureza==='receita')resumo[t].entradas+=l.valor;
+    else resumo[t].saidas+=l.valor;
+  });
+
+  let rows=Object.values(resumo);
+  /* Apply search filter */
+  if(srch)rows=rows.filter(r=>r.tipo.toLowerCase().includes(srch));
+  /* Sort by saldo desc */
+  rows.sort((a,b)=>(b.entradas-b.saidas)-(a.entradas-a.saidas));
+
+  const tbody=document.getElementById('ctrlResumoBody');
+  if(!tbody)return;
+  document.getElementById('ctrlResumoBadge').textContent=rows.length+' tipo'+(rows.length!==1?'s':'');
+
+  if(!rows.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="4">Nenhum dado no período.</td></tr>`;
+    return;
+  }
+
+  const totalSaldo=rows.reduce((s,r)=>s+(r.entradas-r.saidas),0);
+  tbody.innerHTML=rows.map(r=>{
+    const saldo=r.entradas-r.saidas;
+    const saldoClass=saldo>=0?'td-value-income':'td-value-expense';
+    const saldoStr=saldo>=0?Fmt.brl(saldo):`−${Fmt.brl(Math.abs(saldo))}`;
+    const entStr=r.entradas>0?`<span class="td-value-income">${Fmt.brl(r.entradas)}</span>`:`<span style="color:var(--text-muted)">—</span>`;
+    const saiStr=r.saidas>0?`<span class="td-value-expense">−${Fmt.brl(r.saidas)}</span>`:`<span style="color:var(--text-muted)">—</span>`;
+    return`<tr><td style="font-size:.84rem;font-weight:500;">${r.tipo}</td><td style="text-align:right;">${entStr}</td><td style="text-align:right;">${saiStr}</td><td style="text-align:right;"><span class="${saldoClass}" style="font-weight:600;">${saldoStr}</span></td></tr>`;
+  }).join('');
+
+  /* Total row */
+  const totSaldoClass=totalSaldo>=0?'td-value-income':'td-value-expense';
+  const totSaldoStr=totalSaldo>=0?Fmt.brl(totalSaldo):`−${Fmt.brl(Math.abs(totalSaldo))}`;
+  const totEntradas=rows.reduce((s,r)=>s+r.entradas,0);
+  const totSaidas=rows.reduce((s,r)=>s+r.saidas,0);
+  tbody.innerHTML+=`<tr class="ctrl-total-row"><td style="font-size:.82rem;">Total</td><td style="text-align:right;" class="td-value-income">${Fmt.brl(totEntradas)}</td><td style="text-align:right;" class="td-value-expense">−${Fmt.brl(totSaidas)}</td><td style="text-align:right;"><span class="${totSaldoClass}" style="font-weight:700;">${totSaldoStr}</span></td></tr>`;
+}if(ctrlMainSortSt.col===col)ctrlMainSortSt.dir*=-1;else{ctrlMainSortSt.col=col;ctrlMainSortSt.dir=1;}document.getElementById('ctrlTable').querySelectorAll('thead th').forEach(th=>{th.classList.toggle('sorted',th.dataset.col===col);if(th.querySelector('.sort-icon'))th.querySelector('.sort-icon').textContent=th.dataset.col===col?(ctrlMainSortSt.dir===1?'↑':'↓'):'↕';});renderCtrlTable();}
 
 function renderCtrlTable(){
   const tbody=document.getElementById('ctrlBody');
@@ -726,8 +804,9 @@ function renderCtrlTable(){
   const{col,dir}=ctrlMainSortSt;
   linhas.sort((a,b)=>{let av,bv;if(col==='ref')av=a.ref,bv=b.ref;else if(col==='origem')av=a.origem,bv=b.origem;else if(col==='tipo')av=a.tipo,bv=b.tipo;else if(col==='descricao')av=a.descricao,bv=b.descricao;else if(col==='valor')av=a.valor,bv=b.valor;else av=a.ref,bv=b.ref;return av<bv?-dir:av>bv?dir:0;});
   document.getElementById('ctrlTotalBadge').textContent=linhas.length+' registro'+(linhas.length!==1?'s':'');
-  if(!linhas.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Nenhum dado no período selecionado.</td></tr>`;return;}
+  if(!linhas.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Nenhum dado no período selecionado.</td></tr>`;renderCtrlResumoOrigem();return;}
   tbody.innerHTML=linhas.map(l=>{const valClass=l.natureza==='receita'?'td-value-income':'td-value-expense';const naturezaBadge=l.natureza==='receita'?`<span class="nature-badge receita">↑ Receita</span>`:`<span class="nature-badge despesa">↓ Despesa</span>`;return`<tr><td class="td-ref">${Fmt.ref(l.ref)}</td><td><span class="origin-badge">${l.origem}</span></td><td><span class="td-tag">${l.tipo}</span></td><td style="font-size:.83rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.descricao}</td><td class="${valClass}">${Fmt.brl(l.valor)}</td><td>${naturezaBadge}</td></tr>`;}).join('');
+  renderCtrlResumoOrigem();
 }
 
 /* ════════════════════════════════════════════
