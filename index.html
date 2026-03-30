@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FinPanel — Painel de Controle Financeiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="estilo.css"/>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#05120D" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="15" rx="2"/><path d="M6 5V4a1 1 0 011-1h10a1 1 0 011 1v1"/><path d="M12 11v3M10 11h4"/></svg></div>
+      <div><div class="login-logo-text">FinPanel</div><div class="login-logo-sub">Painel Financeiro</div></div>
+    </div>
+    <div class="login-title">Bem-vindo de volta</div>
+    <div class="login-sub">Insira suas credenciais para acessar o painel.</div>
+    <div class="login-form">
+      <div id="loginError" class="login-error">Usuário ou senha incorretos.</div>
+      <div class="form-group"><label>Usuário</label><input type="text" id="loginUser" placeholder="Seu nome de usuário" autocomplete="username"/></div>
+      <div class="form-group"><label>Senha</label><div class="password-wrap"><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/><button class="password-toggle" type="button" onclick="togglePwd('loginPass',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <button class="btn btn-primary btn-full" style="margin-top:6px;" onclick="fazerLogin()">Entrar</button>
+    </div>
+    <div class="login-footer">Credencial padrão: <strong>Administrador</strong> / <strong>admin123</strong></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appWrapper">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#05120D" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="16" height="11" rx="2"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v1"/><path d="M9 9v2M7 9h4"/></svg></div>
+      <div><div class="logo-text">FinPanel</div><div class="logo-sub">v2.0.0</div></div>
+    </div>
+    <div class="nav-group-label">Principal</div>
+    <div class="nav-item active" data-tab="salario" title="Salário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Salário</span></div>
+    <div class="nav-item" data-tab="saidas" title="Saídas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Saídas</span></div>
+    <div class="nav-item" data-tab="entradas" title="Entradas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Entradas</span></div>
+    <div class="nav-item" data-tab="controle" title="Controle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Controle</span></div>
+    <div class="nav-item" data-tab="investimento" title="Investimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span>Investimento</span></div>
+    <div class="nav-group-label">Sistema</div>
+    <div class="nav-item" data-tab="configuracao" title="Configuração"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Configuração</span></div>
+    <div class="sidebar-bottom">
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <div class="toggle-track"><div class="toggle-thumb"></div></div><span class="theme-label">Tema</span>
+      </div>
+      <button class="sidebar-collapse-btn" onclick="toggleSidebar()" id="collapseBtn">
+        <span class="collapse-icon" id="collapseIcon">‹</span>
+        <span class="collapse-label">Recolher</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Salário</div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbarDate"></div>
+        <div class="avatar-wrap">
+          <div class="avatar" id="userAvatar" onclick="toggleUserDropdown()">AD</div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header"><div class="dropdown-user-name" id="dropdownName">Administrador</div><div class="dropdown-user-role" id="dropdownRole">Admin</div></div>
+            <div class="dropdown-item" onclick="abrirTrocarSenha()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Trocar senha</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item danger" onclick="fazerLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ═══ SALÁRIO ═══ -->
+      <div class="tab-panel active" id="tab-salario">
+        <div class="filter-bar" id="filterBarGlobal">
+          <label>Ano:</label><select id="filtroAno" onchange="onFiltroAnoChange()" style="width:100px;"><option value="">Todos</option></select>
+          <div class="filter-sep"></div>
+          <label>Mês / Ano:</label><select id="filtroRef" onchange="onFiltroRefChange()" style="width:190px;"><option value="">Todos os períodos</option></select>
+          <button class="filter-clear" onclick="limparFiltro()">✕ Limpar</button>
+          <span id="filtroLabel" class="filter-label-badge" style="display:none;"></span>
+        </div>
+        <div class="grid-3 mb-20">
+          <div class="stat-card green"><div class="stat-label">Salário Líquido</div><div class="stat-value income" id="statLiquido">R$ 0,00</div><div class="stat-sub">Adiantamento + Pagamento</div></div>
+          <div class="stat-card blue"><div class="stat-label">Salário Bruto</div><div class="stat-value neutral" id="statBruto">R$ 0,00</div><div class="stat-sub">Bruto do período</div></div>
+          <div class="stat-card warn"><div class="stat-label">Extras Líquido</div><div class="stat-value neutral" id="statExtras">R$ 0,00</div><div class="stat-sub">Soma líquida dos extras</div></div>
+        </div>
+        <!-- grid-2: tabelas + painel inserção lado a lado -->
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Tabela Salário</div><div class="flex-gap"><span class="card-badge" id="salarioBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:120px;padding:5px 10px;font-size:.78rem;" id="filterSalario" oninput="renderSalarioTable()"/></div></div>
+              <div class="table-wrap"><table id="salarioTable"><thead><tr>
+                <th onclick="sortTable('salario','ref')" data-col="ref">Referência <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('salario','adiantamento')" data-col="adiantamento">Adiantamento <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('salario','pagamento')" data-col="pagamento">Pagamento <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('salario','liquido')" data-col="liquido">Líquido <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('salario','bruto')" data-col="bruto">Bruto <span class="sort-icon">↕</span></th>
+                <th class="no-sort">Ações</th>
+              </tr></thead><tbody id="salarioBody"></tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Tabela Extras</div><div class="flex-gap"><span class="card-badge" id="extrasBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:120px;padding:5px 10px;font-size:.78rem;" id="filterExtras" oninput="renderExtrasTable()"/></div></div>
+              <div class="table-wrap"><table id="extrasTable"><thead><tr>
+                <th onclick="sortTable('extras','ref')" data-col="ref">Referência <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('extras','tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('extras','liquido')" data-col="liquido">Líquido <span class="sort-icon">↕</span></th>
+                <th onclick="sortTable('extras','bruto')" data-col="bruto">Bruto <span class="sort-icon">↕</span></th>
+                <th class="no-sort">Ações</th>
+              </tr></thead><tbody id="extrasBody"></tbody></table></div>
+            </div>
+          </div>
+          <!-- PAINEL INSERÇÃO SALÁRIO (lado direito) -->
+          <div class="insert-panel" style="align-self:start;position:sticky;top:74px;">
+            <div class="insert-panel-header"><div class="insert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div><div class="section-title">Inserir Dados</div><div class="text-muted">Registrar novo lançamento</div></div></div>
+            <div class="form-grid single">
+              <div class="form-group"><label>Referência (Mês/Ano)</label><input type="month" id="insertRef"/></div>
+              <div class="form-group"><label>Tabela</label><select id="insertTabela" onchange="onTabelaChange()"><option value="salario">Salário</option><option value="extras">Extras</option></select></div>
+            </div>
+            <div id="salarioFields" style="margin-top:14px;">
+              <div class="form-grid single">
+                <div class="form-group"><label>Tipo do Valor</label><select id="salarioTipo"><option value="adiantamento">Adiantamento</option><option value="pagamento">Pagamento</option><option value="bruto">Salário Bruto</option></select></div>
+                <div class="form-group"><label>Valor</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="salarioValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+              </div>
+            </div>
+            <div id="extrasFields" style="margin-top:14px;display:none;">
+              <div class="form-grid single"><div class="form-group"><label>Tipo</label><select id="extrasTipo"></select></div></div>
+              <div class="field-row-2" style="margin-top:12px;">
+                <div class="form-group"><label>Valor Líquido</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="extrasLiquido" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+                <div class="form-group"><label>Valor Bruto</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="extrasBruto" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+              </div>
+            </div>
+            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" onclick="confirmarInsercaoSalario()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SAÍDAS ═══ -->
+      <div class="tab-panel" id="tab-saidas">
+        <!-- Filtro global espelhado -->
+        <div class="filter-bar">
+          <label>Ano:</label><select id="saidaFiltroAnoDisp" onchange="onFiltroAnoChange()" style="width:100px;"></select>
+          <div class="filter-sep"></div>
+          <label>Mês / Ano:</label><select id="saidaFiltroRefDisp" onchange="onFiltroRefChange()" style="width:190px;"></select>
+          <button class="filter-clear" onclick="limparFiltro()">✕ Limpar</button>
+          <span id="saidaFiltroLabel" class="filter-label-badge" style="display:none;"></span>
+        </div>
+        <div class="grid-3 mb-20">
+          <div class="stat-card red"><div class="stat-label">Total de Saídas</div><div class="stat-value expense" id="saidaStatTotal">R$ 0,00</div><div class="stat-sub">Soma das parcelas no filtro</div></div>
+          <div class="stat-card warn"><div class="stat-label">A Pagar</div><div class="stat-value neutral" id="saidaStatPendente">R$ 0,00</div><div class="stat-sub">Parcelas pendentes</div></div>
+          <div class="stat-card green"><div class="stat-label">Pago</div><div class="stat-value income" id="saidaStatPago">R$ 0,00</div><div class="stat-sub">Parcelas quitadas</div></div>
+        </div>
+        <!-- grid-2: tabela + painel inserção lado a lado -->
+        <div class="grid-2" style="align-items:start;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Tabela de Saídas</div><div class="flex-gap"><span class="card-badge" id="saidaBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:130px;padding:5px 10px;font-size:.78rem;" id="filterSaida" oninput="renderSaidasTable()"/></div></div>
+            <div class="table-wrap" style="max-height:500px;">
+              <table id="saidasTable">
+                <thead><tr>
+                  <th onclick="sortSaida('ref')" data-col="ref">Ref. <span class="sort-icon">↕</span></th>
+                  <th onclick="sortSaida('tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                  <th onclick="sortSaida('descricao')" data-col="descricao">Descrição <span class="sort-icon">↕</span></th>
+                  <th class="no-sort">Parcela</th>
+                  <th onclick="sortSaida('valor')" data-col="valor">Valor <span class="sort-icon">↕</span></th>
+                  <th class="no-sort">Status</th>
+                  <th class="no-sort">Ações</th>
+                </tr></thead>
+                <tbody id="saidasBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- PAINEL INSERÇÃO SAÍDAS (lado direito, igual ao Salário) -->
+          <div class="insert-panel" style="align-self:start;position:sticky;top:74px;">
+            <div class="insert-panel-header"><div class="insert-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div><div class="section-title">Registrar Saída</div><div class="text-muted">Adicionar nova despesa</div></div></div>
+            <div class="form-grid single">
+              <div class="form-group"><label>Referência (Mês/Ano)</label><input type="month" id="saidaRef"/></div>
+              <div class="form-group"><label>Tipo de Conta</label><select id="saidaTipoConta"></select></div>
+              <div class="form-group"><label>Descrição</label><input type="text" id="saidaDescricao" placeholder="Ex: Conta de luz, Nubank..."/></div>
+              <div class="form-group"><label>Forma de Pagamento</label>
+                <select id="saidaForma" onchange="onSaidaFormaChange()"><option value="avista">À Vista</option><option value="parcelado">Parcelado</option></select>
+              </div>
+              <div class="form-group"><label id="saidaValorLabel">Valor Pago</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="saidaValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+            </div>
+            <div class="parcela-fields" id="parcelaFields">
+              <div class="parcela-fields-title">Detalhes do Parcelamento</div>
+              <div class="field-row-2">
+                <div class="form-group"><label>Nº de Parcelas</label><input type="text" id="saidaNParcelas" placeholder="Ex: 12" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+                <div class="form-group"><label>Mês/Ano da 1ª Parcela</label><input type="month" id="saidaPrimeiraParcela"/></div>
+              </div>
+            </div>
+            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" onclick="confirmarInsercaoSaida()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar Saída</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ENTRADAS ═══ -->
+      <div class="tab-panel" id="tab-entradas">
+        <div class="filter-bar">
+          <label>Ano:</label><select id="entradaFiltroAnoDisp" onchange="onFiltroAnoChange()" style="width:100px;"></select>
+          <div class="filter-sep"></div>
+          <label>Mês / Ano:</label><select id="entradaFiltroRefDisp" onchange="onFiltroRefChange()" style="width:190px;"></select>
+          <button class="filter-clear" onclick="limparFiltro()">✕ Limpar</button>
+          <span id="entradaFiltroLabel" class="filter-label-badge" style="display:none;"></span>
+        </div>
+        <div class="grid-3 mb-20">
+          <div class="stat-card green"><div class="stat-label">Total de Entradas</div><div class="stat-value income" id="entradaStatTotal">R$ 0,00</div><div class="stat-sub">Soma das parcelas no filtro</div></div>
+          <div class="stat-card warn"><div class="stat-label">A Receber</div><div class="stat-value neutral" id="entradaStatPendente">R$ 0,00</div><div class="stat-sub">Parcelas pendentes</div></div>
+          <div class="stat-card blue"><div class="stat-label">Recebido</div><div class="stat-value blue" id="entradaStatPago">R$ 0,00</div><div class="stat-sub">Parcelas confirmadas</div></div>
+        </div>
+        <!-- grid-2: tabela + painel inserção lado a lado -->
+        <div class="grid-2" style="align-items:start;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Tabela de Entradas</div><div class="flex-gap"><span class="card-badge" id="entradaBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:130px;padding:5px 10px;font-size:.78rem;" id="filterEntrada" oninput="renderEntradasTable()"/></div></div>
+            <div class="table-wrap" style="max-height:500px;">
+              <table id="entradasTable">
+                <thead><tr>
+                  <th onclick="sortEntrada('ref')" data-col="ref">Ref. <span class="sort-icon">↕</span></th>
+                  <th onclick="sortEntrada('tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                  <th onclick="sortEntrada('descricao')" data-col="descricao">Descrição <span class="sort-icon">↕</span></th>
+                  <th class="no-sort">Parcela</th>
+                  <th onclick="sortEntrada('valor')" data-col="valor">Valor <span class="sort-icon">↕</span></th>
+                  <th class="no-sort">Status</th>
+                  <th class="no-sort">Ações</th>
+                </tr></thead>
+                <tbody id="entradasBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- PAINEL INSERÇÃO ENTRADAS (lado direito, igual ao Salário) -->
+          <div class="insert-panel" style="align-self:start;position:sticky;top:74px;">
+            <div class="insert-panel-header"><div class="insert-icon" style="background:rgba(0,201,122,.15);color:var(--income);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div><div class="section-title">Registrar Entrada</div><div class="text-muted">Adicionar recebimento</div></div></div>
+            <div class="form-grid single">
+              <div class="form-group"><label>Referência (Mês/Ano)</label><input type="month" id="entradaRef"/></div>
+              <div class="form-group"><label>Tipo de Conta</label><select id="entradaTipoConta"></select></div>
+              <div class="form-group"><label>Descrição</label><input type="text" id="entradaDescricao" placeholder="Ex: Aluguel, freelance..."/></div>
+              <div class="form-group"><label>Forma de Recebimento</label>
+                <select id="entradaForma" onchange="onEntradaFormaChange()"><option value="avista">À Vista</option><option value="parcelado">Parcelado</option></select>
+              </div>
+              <div class="form-group"><label id="entradaValorLabel">Valor Recebido</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="entradaValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+            </div>
+            <div class="parcela-fields" id="entradaParcelaFields">
+              <div class="parcela-fields-title">Detalhes do Parcelamento</div>
+              <div class="field-row-2">
+                <div class="form-group"><label>Nº de Parcelas</label><input type="text" id="entradaNParcelas" placeholder="Ex: 12" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+                <div class="form-group"><label>Mês/Ano da 1ª Parcela</label><input type="month" id="entradaPrimeiraParcela"/></div>
+              </div>
+            </div>
+            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" onclick="confirmarInsercaoEntrada()" style="background:var(--income);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar Entrada</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CONTROLE ═══ -->
+      <div class="tab-panel" id="tab-controle">
+        <div class="filter-bar">
+          <label>Ano:</label><select id="ctrlFiltroAnoDisp" onchange="onFiltroAnoChange()" style="width:100px;"></select>
+          <div class="filter-sep"></div>
+          <label>Mês / Ano:</label><select id="ctrlFiltroRefDisp" onchange="onFiltroRefChange()" style="width:190px;"></select>
+          <button class="filter-clear" onclick="limparFiltro()">✕ Limpar</button>
+          <span id="ctrlFiltroLabel" class="filter-label-badge" style="display:none;"></span>
+        </div>
+        <!-- 4 cards: Receitas, Despesas, Investimento, Saldo -->
+        <div class="grid-4 mb-20">
+          <div class="stat-card green">
+            <div class="stat-label">Receitas</div>
+            <div class="stat-value income" id="ctrlStatReceitas">R$ 0,00</div>
+            <div class="stat-sub">Salário Líquido + Extras + Entradas</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Despesas</div>
+            <div class="stat-value expense" id="ctrlStatDespesas">R$ 0,00</div>
+            <div class="stat-sub">Total de Saídas</div>
+          </div>
+          <div class="stat-card invest">
+            <div class="stat-label">Investimentos</div>
+            <div class="stat-value invest" id="ctrlStatInvest">R$ 0,00</div>
+            <div class="stat-sub">Total aportado no período</div>
+          </div>
+          <div class="stat-card blue" id="ctrlSaldoCard">
+            <div class="stat-label">Saldo do Período</div>
+            <div class="stat-value" id="ctrlStatSaldo">R$ 0,00</div>
+            <div class="stat-sub">Receitas − Despesas − Invest.</div>
+          </div>
+        </div>
+        <div class="grid-2" style="align-items:start;gap:20px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Receitas por Tipo</div><span class="card-badge" id="ctrlReceitasBadge">—</span></div>
+            <div class="table-wrap">
+              <table id="ctrlReceitasTable">
+                <thead><tr>
+                  <th onclick="sortCtrl('receitas','tipo')" data-col="tipo">Tipo / Origem <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('receitas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('receitas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('receitas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
+                </tr></thead>
+                <tbody id="ctrlReceitasBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Despesas por Tipo</div><span class="card-badge" id="ctrlDespesasBadge">—</span></div>
+            <div class="table-wrap">
+              <table id="ctrlDespesasTable">
+                <thead><tr>
+                  <th onclick="sortCtrl('despesas','tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('despesas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('despesas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
+                  <th onclick="sortCtrl('despesas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
+                </tr></thead>
+                <tbody id="ctrlDespesasBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header">
+            <div class="card-title">Consolidado do Período</div>
+            <div class="flex-gap">
+              <span class="card-badge" id="ctrlTotalBadge">0 registros</span>
+              <input type="text" placeholder="Buscar..." style="width:150px;padding:5px 10px;font-size:.78rem;" id="filterCtrl" oninput="renderCtrlTable()"/>
+            </div>
+          </div>
+          <div class="table-wrap" style="max-height:420px;">
+            <table id="ctrlTable">
+              <thead><tr>
+                <th onclick="sortCtrlMain('ref')" data-col="ref">Referência <span class="sort-icon">↕</span></th>
+                <th onclick="sortCtrlMain('origem')" data-col="origem">Origem <span class="sort-icon">↕</span></th>
+                <th onclick="sortCtrlMain('tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                <th onclick="sortCtrlMain('descricao')" data-col="descricao">Descrição <span class="sort-icon">↕</span></th>
+                <th onclick="sortCtrlMain('valor')" data-col="valor">Valor <span class="sort-icon">↕</span></th>
+                <th class="no-sort">Natureza</th>
+              </tr></thead>
+              <tbody id="ctrlBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ INVESTIMENTO ═══ -->
+      <div class="tab-panel" id="tab-investimento">
+        <div class="filter-bar">
+          <label>Ano:</label><select id="investFiltroAnoDisp" onchange="onFiltroAnoChange()" style="width:100px;"></select>
+          <div class="filter-sep"></div>
+          <label>Mês / Ano:</label><select id="investFiltroRefDisp" onchange="onFiltroRefChange()" style="width:190px;"></select>
+          <button class="filter-clear" onclick="limparFiltro()">✕ Limpar</button>
+          <span id="investFiltroLabel" class="filter-label-badge" style="display:none;"></span>
+        </div>
+        <div class="grid-3 mb-20">
+          <div class="stat-card invest"><div class="stat-label">Total Investido</div><div class="stat-value invest" id="investStatTotal">R$ 0,00</div><div class="stat-sub">Período filtrado</div></div>
+          <div class="stat-card green"><div class="stat-label">Patrimônio Total</div><div class="stat-value income" id="investStatPatrimonio">R$ —</div><div class="stat-sub">Todos os aportes</div></div>
+          <div class="stat-card blue"><div class="stat-label">Tipos Ativos</div><div class="stat-value neutral" id="investStatTipos">—</div><div class="stat-sub">Categorias cadastradas</div></div>
+        </div>
+        <div class="grid-2" style="align-items:start;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Aportes Registrados</div><div class="flex-gap"><span class="card-badge" id="investBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:130px;padding:5px 10px;font-size:.78rem;" id="filterInvest" oninput="renderInvestTable()"/></div></div>
+            <div class="table-wrap" style="max-height:500px;">
+              <table id="investTable">
+                <thead><tr>
+                  <th onclick="sortInvest('ref')" data-col="ref">Ref. <span class="sort-icon">↕</span></th>
+                  <th onclick="sortInvest('tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                  <th onclick="sortInvest('descricao')" data-col="descricao">Descrição <span class="sort-icon">↕</span></th>
+                  <th onclick="sortInvest('valor')" data-col="valor">Valor <span class="sort-icon">↕</span></th>
+                  <th class="no-sort">Ações</th>
+                </tr></thead>
+                <tbody id="investBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- PAINEL INSERÇÃO INVESTIMENTO -->
+          <div class="insert-panel" style="align-self:start;position:sticky;top:74px;">
+            <div class="insert-panel-header">
+              <div class="insert-icon" style="background:var(--invest-dim);color:var(--invest);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div><div class="section-title">Registrar Aporte</div><div class="text-muted">Adicionar novo investimento</div></div>
+            </div>
+            <div class="form-grid single">
+              <div class="form-group"><label>Referência (Mês/Ano)</label><input type="month" id="investRef"/></div>
+              <div class="form-group"><label>Tipo de Investimento</label><select id="investTipo"></select></div>
+              <div class="form-group"><label>Descrição</label><input type="text" id="investDescricao" placeholder="Ex: Tesouro Direto, Ação PETR4..."/></div>
+              <div class="form-group"><label>Valor Aportado</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="investValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+            </div>
+            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" onclick="confirmarInsercaoInvest()" style="background:var(--invest);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar Aporte</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CONFIGURAÇÃO ═══ -->
+      <div class="tab-panel" id="tab-configuracao">
+        <div class="sub-tabs">
+          <div class="sub-tab active" data-subtab="usuarios">Usuários</div>
+          <div class="sub-tab" data-subtab="criterios">Critérios</div>
+        </div>
+        <!-- USUÁRIOS -->
+        <div class="sub-panel active" id="subtab-usuarios">
+          <div class="grid-2">
+            <div>
+              <div class="flex-between mb-16"><div><div class="card-title" style="margin-bottom:4px;">Usuários Cadastrados</div><div class="text-muted">Gerencie acessos e perfis</div></div><button class="btn btn-primary btn-sm" onclick="limparUserForm()">+ Novo Usuário</button></div>
+              <div id="userList"></div>
+            </div>
+            <div class="insert-panel" style="align-self:start;">
+              <div class="insert-panel-header"><div class="insert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="section-title" id="userFormTitle">Novo Usuário</div><div class="text-muted">Preencha os dados abaixo</div></div></div>
+              <div class="form-grid single">
+                <input type="hidden" id="editUserId" value=""/>
+                <div class="form-group"><label>Nome Completo</label><input type="text" id="userNome" placeholder="Ex: João Silva"/></div>
+                <div class="form-group"><label>Perfil</label><select id="userPerfil"><option value="usuario">Usuário</option><option value="admin">Admin</option></select></div>
+                <div class="form-group" id="senhaNovoGroup"><label>Senha</label><div class="password-wrap"><input type="password" id="userSenha" placeholder="Mínimo 4 caracteres"/><button class="password-toggle" type="button" onclick="togglePwd('userSenha',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+                <div class="form-group" id="senhaEditGroup" style="display:none;"><label>Nova Senha <span style="opacity:.5;text-transform:none;letter-spacing:0;font-family:var(--font-body);">(deixe em branco para manter)</span></label><div class="password-wrap"><input type="password" id="userSenhaEdit" placeholder="Nova senha (opcional)"/><button class="password-toggle" type="button" onclick="togglePwd('userSenhaEdit',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+              </div>
+              <div style="margin-top:18px;display:flex;gap:10px;"><button class="btn btn-primary" style="flex:1;" onclick="salvarUsuario()">Salvar</button><button class="btn btn-secondary" onclick="limparUserForm()">Cancelar</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- CRITÉRIOS -->
+        <div class="sub-panel" id="subtab-criterios">
+          <div class="grid-2">
+            <div style="display:flex;flex-direction:column;gap:20px;">
+              <!-- Critérios de Extras -->
+              <div class="insert-panel">
+                <div class="insert-panel-header"><div class="insert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div><div class="section-title">Critérios de Extras (Salário)</div><div class="text-muted">Tipos para lançamentos de Extras</div></div></div>
+                <div class="form-grid" style="grid-template-columns:1fr auto;align-items:end;gap:10px;"><div class="form-group"><label>Nome do Critério</label><input type="text" id="criterioInput" placeholder="Ex: Hora Extra, Bônus, PLR..." onkeydown="if(event.key==='Enter')adicionarCriterio()"/></div><button class="btn btn-primary" onclick="adicionarCriterio()" style="height:38px;">+ Adicionar</button></div>
+                <div class="divider"></div>
+                <div class="text-muted mb-16">Critérios ativos</div>
+                <div class="criteria-list" id="criteriaList"></div>
+                <div id="criteriasEmpty" style="display:none;color:var(--text-muted);font-size:.82rem;padding:12px 0;">Nenhum critério cadastrado.</div>
+              </div>
+              <!-- Tipos de Conta -->
+              <div class="insert-panel">
+                <div class="insert-panel-header"><div class="insert-icon" style="background:rgba(77,121,255,.15);color:#4D79FF;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div><div class="section-title">Tipos de Conta</div><div class="text-muted">Usado nas abas Entradas e Saídas</div></div></div>
+                <div class="form-grid" style="grid-template-columns:1fr auto;align-items:end;gap:10px;"><div class="form-group"><label>Nome do Tipo</label><input type="text" id="tipoContaInput" placeholder="Ex: Cartão, Boleto, PIX..." onkeydown="if(event.key==='Enter')adicionarTipoConta()"/></div><button class="btn btn-primary" onclick="adicionarTipoConta()" style="height:38px;">+ Adicionar</button></div>
+                <div class="divider"></div>
+                <div class="text-muted mb-16">Tipos cadastrados</div>
+                <div class="criteria-list" id="tiposContaList"></div>
+                <div id="tiposContaEmpty" style="display:none;color:var(--text-muted);font-size:.82rem;padding:12px 0;">Nenhum tipo cadastrado.</div>
+              </div>
+              <!-- Tipos de Investimento -->
+              <div class="insert-panel">
+                <div class="insert-panel-header"><div class="insert-icon" style="background:var(--invest-dim);color:var(--invest);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><div class="section-title">Tipos de Investimento</div><div class="text-muted">Usado na aba Investimento</div></div></div>
+                <div class="form-grid" style="grid-template-columns:1fr auto;align-items:end;gap:10px;"><div class="form-group"><label>Nome do Tipo</label><input type="text" id="tipoInvestInput" placeholder="Ex: Renda Fixa, Ações, FII..." onkeydown="if(event.key==='Enter')adicionarTipoInvest()"/></div><button class="btn btn-primary" onclick="adicionarTipoInvest()" style="height:38px;">+ Adicionar</button></div>
+                <div class="divider"></div>
+                <div class="text-muted mb-16">Tipos cadastrados</div>
+                <div class="criteria-list" id="tiposInvestList"></div>
+                <div id="tiposInvestEmpty" style="display:none;color:var(--text-muted);font-size:.82rem;padding:12px 0;">Nenhum tipo cadastrado.</div>
+              </div>
+            </div>
+            <div class="card" style="align-self:start;">
+              <div class="card-header"><div class="card-title">Como funciona</div></div>
+              <div style="font-size:.85rem;color:var(--text-secondary);line-height:1.7;">
+                <p><strong style="color:var(--text-primary)">Critérios de Extras</strong> são usados como <em>Tipo</em> na tabela <strong style="color:var(--text-primary)">Extras</strong> da aba Salário.</p>
+                <div class="divider"></div>
+                <p><strong style="color:var(--text-primary)">Tipos de Conta</strong> categorizam lançamentos nas abas <strong style="color:var(--income)">Entradas</strong> e <strong style="color:var(--expense)">Saídas</strong>.</p>
+                <div class="divider"></div>
+                <p><strong style="color:var(--invest)">Tipos de Investimento</strong> categorizam os aportes na aba <strong style="color:var(--invest)">Investimento</strong>.</p>
+                <div class="divider"></div>
+                <p style="font-size:.78rem;">Exemplos: Renda Fixa, Ações, FII, Criptomoedas, Tesouro Direto, CDB, LCI.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </main>
+</div><!-- /appWrapper -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MODAIS -->
+<div class="modal-overlay hidden" id="modalExcluirUser"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Usuário</div><button class="modal-close" onclick="closeModal('modalExcluirUser')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Tem certeza que deseja excluir <strong id="deleteUserName" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirUser')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoUser()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalTrocarSenha"><div class="modal"><div class="modal-header"><div class="modal-title">Trocar Senha</div><button class="modal-close" onclick="closeModal('modalTrocarSenha')">✕</button></div><div class="form-grid single" style="gap:14px;"><div class="form-group"><label>Nova Senha</label><div class="password-wrap"><input type="password" id="novaSenha" placeholder="Mínimo 4 caracteres"/><button class="password-toggle" type="button" onclick="togglePwd('novaSenha',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div class="form-group"><label>Confirmar Nova Senha</label><div class="password-wrap"><input type="password" id="confirmarSenha" placeholder="Repita a nova senha"/><button class="password-toggle" type="button" onclick="togglePwd('confirmarSenha',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div id="senhaErro" style="font-size:.8rem;color:var(--expense);display:none;padding:8px 12px;background:rgba(255,77,106,.08);border-radius:var(--radius-sm);border:1px solid rgba(255,77,106,.2);"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalTrocarSenha')">Cancelar</button><button class="btn btn-primary" onclick="confirmarTrocarSenha()">Confirmar</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirEntrada"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Entrada</div><button class="modal-close" onclick="closeModal('modalExcluirEntrada')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir <strong id="deleteEntradaDesc" style="color:var(--text-primary);"></strong>? Todas as parcelas serão removidas.</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirEntrada')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoEntrada()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirSalario"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Registro</div><button class="modal-close" onclick="closeModal('modalExcluirSalario')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;" id="deleteSalarioMsg"></p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirSalario')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoSalario()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirExtra"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Extra</div><button class="modal-close" onclick="closeModal('modalExcluirExtra')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir o registro <strong id="deleteExtraDesc" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirExtra')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoExtra()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirSaida"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Saída</div><button class="modal-close" onclick="closeModal('modalExcluirSaida')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir <strong id="deleteSaidaDesc" style="color:var(--text-primary);"></strong>? Todas as parcelas serão removidas.</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirSaida')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoSaida()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirInvest"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Aporte</div><button class="modal-close" onclick="closeModal('modalExcluirInvest')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir o aporte <strong id="deleteInvestDesc" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirInvest')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoInvest()">Excluir</button></div></div></div>
+
+<script src="script.js"></script>
+</body>
+</html>
