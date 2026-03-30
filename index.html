@@ -339,6 +339,27 @@
             </table>
           </div>
         </div>
+        <!-- ══ RESUMO POR ORIGEM ══ -->
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header">
+            <div class="card-title">Resumo por Tipo</div>
+            <div class="flex-gap">
+              <span class="card-badge" id="ctrlResumoBadge">—</span>
+              <div class="text-muted" style="font-size:.76rem;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="ctrlResumoTable">
+              <thead><tr>
+                <th>Tipo / Origem</th>
+                <th style="text-align:right;">Entradas</th>
+                <th style="text-align:right;">Saídas</th>
+                <th style="text-align:right;">Saldo</th>
+              </tr></thead>
+              <tbody id="ctrlResumoBody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ═══ INVESTIMENTO ═══ -->
