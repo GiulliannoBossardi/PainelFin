@@ -288,31 +288,55 @@
           </div>
         </div>
         <div class="grid-2" style="align-items:start;gap:20px;">
-          <div class="card">
-            <div class="card-header"><div class="card-title">Receitas por Tipo</div><span class="card-badge" id="ctrlReceitasBadge">—</span></div>
-            <div class="table-wrap">
-              <table id="ctrlReceitasTable">
-                <thead><tr>
-                  <th onclick="sortCtrl('receitas','tipo')" data-col="tipo">Tipo / Origem <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('receitas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('receitas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('receitas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
-                </tr></thead>
-                <tbody id="ctrlReceitasBody"></tbody>
-              </table>
+          <!-- Coluna esquerda: Receitas e Despesas por Tipo empilhadas -->
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Receitas por Tipo</div><span class="card-badge" id="ctrlReceitasBadge">—</span></div>
+              <div class="table-wrap">
+                <table id="ctrlReceitasTable">
+                  <thead><tr>
+                    <th onclick="sortCtrl('receitas','tipo')" data-col="tipo">Tipo / Origem <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('receitas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('receitas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('receitas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
+                  </tr></thead>
+                  <tbody id="ctrlReceitasBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Despesas por Tipo</div><span class="card-badge" id="ctrlDespesasBadge">—</span></div>
+              <div class="table-wrap">
+                <table id="ctrlDespesasTable">
+                  <thead><tr>
+                    <th onclick="sortCtrl('despesas','tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('despesas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('despesas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
+                    <th onclick="sortCtrl('despesas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
+                  </tr></thead>
+                  <tbody id="ctrlDespesasBody"></tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">Despesas por Tipo</div><span class="card-badge" id="ctrlDespesasBadge">—</span></div>
+          <!-- Coluna direita: Resumo por Tipo -->
+          <div class="card" style="align-self:start;position:sticky;top:74px;">
+            <div class="card-header">
+              <div class="card-title">Resumo por Tipo</div>
+              <div class="flex-gap">
+                <span class="card-badge" id="ctrlResumoBadge">—</span>
+                <div class="text-muted" style="font-size:.76rem;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
+              </div>
+            </div>
             <div class="table-wrap">
-              <table id="ctrlDespesasTable">
+              <table id="ctrlResumoTable">
                 <thead><tr>
-                  <th onclick="sortCtrl('despesas','tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('despesas','registros')" data-col="registros">Registros <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('despesas','total')" data-col="total">Total <span class="sort-icon">↕</span></th>
-                  <th onclick="sortCtrl('despesas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
+                  <th>Tipo / Origem</th>
+                  <th style="text-align:right;">Entradas</th>
+                  <th style="text-align:right;">Saídas</th>
+                  <th style="text-align:right;">Saldo</th>
                 </tr></thead>
-                <tbody id="ctrlDespesasBody"></tbody>
+                <tbody id="ctrlResumoBody"></tbody>
               </table>
             </div>
           </div>
@@ -336,27 +360,6 @@
                 <th class="no-sort">Natureza</th>
               </tr></thead>
               <tbody id="ctrlBody"></tbody>
-            </table>
-          </div>
-        </div>
-        <!-- ══ RESUMO POR ORIGEM ══ -->
-        <div class="card" style="margin-top:20px;">
-          <div class="card-header">
-            <div class="card-title">Resumo por Tipo</div>
-            <div class="flex-gap">
-              <span class="card-badge" id="ctrlResumoBadge">—</span>
-              <div class="text-muted" style="font-size:.76rem;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table id="ctrlResumoTable">
-              <thead><tr>
-                <th>Tipo / Origem</th>
-                <th style="text-align:right;">Entradas</th>
-                <th style="text-align:right;">Saídas</th>
-                <th style="text-align:right;">Saldo</th>
-              </tr></thead>
-              <tbody id="ctrlResumoBody"></tbody>
             </table>
           </div>
         </div>
