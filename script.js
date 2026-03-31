@@ -150,16 +150,68 @@ async function fazerLogin(){
   const senha=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
   err.classList.remove('visible');
-  if(!nome||!senha){err.classList.add('visible');return;}
+  if(!nome||!senha){
+    err.textContent='Preencha usuário e senha.';
+    err.classList.add('visible');
+    return;
+  }
   setLoginLoading(true);
   try{
     await signInWithEmailAndPassword(fireAuth,toEmail(nome),senha);
-    // onAuthStateChanged assume o controle a partir daqui
+    // onAuthStateChanged assume o controle
   }catch(e){
+    let msg='Usuário ou senha incorretos.';
+    if(e.code==='auth/network-request-failed') msg='Sem conexão com a internet.';
+    if(e.code==='auth/too-many-requests')      msg='Muitas tentativas. Aguarde alguns minutos.';
+    err.textContent=msg;
     err.classList.add('visible');
     document.getElementById('loginPass').value='';
   }finally{
     setLoginLoading(false);
+  }
+}
+
+/* ── SETUP PRIMEIRO ACESSO ──
+   Chamado pelo onAuthStateChanged quando não há usuários cadastrados.
+   Mostra um formulário inline na tela de login para criar o admin inicial. ── */
+function mostrarSetupAdmin(){
+  const box=document.querySelector('.login-box');
+  if(!box||document.getElementById('setupAdminForm'))return;
+
+  // Esconde o formulário de login normal
+  document.querySelector('.login-form').style.display='none';
+  document.querySelector('.login-footer').style.display='none';
+  document.querySelector('.login-title').textContent='Primeiro acesso';
+  document.querySelector('.login-sub').textContent='Crie o usuário Administrador para começar.';
+
+  const form=document.createElement('div');
+  form.id='setupAdminForm';
+  form.innerHTML=`
+    <div id="setupError" style="display:none;color:var(--expense);font-size:.82rem;padding:8px 12px;background:rgba(255,77,106,.08);border-radius:var(--radius-sm);border:1px solid rgba(255,77,106,.2);margin-bottom:12px;"></div>
+    <div class="form-group"><label>Nome do administrador</label><input type="text" id="setupNome" placeholder="Ex: Administrador" value="Administrador"/></div>
+    <div class="form-group" style="margin-top:10px;"><label>Senha</label><div class="password-wrap"><input type="password" id="setupSenha" placeholder="Mínimo 6 caracteres"/><button class="password-toggle" type="button" onclick="togglePwd('setupSenha',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+    <button class="btn btn-primary btn-full" style="margin-top:16px;" onclick="criarAdminInicial()">Criar e entrar</button>
+  `;
+  box.appendChild(form);
+  setTimeout(()=>document.getElementById('setupSenha').focus(),100);
+}
+
+async function criarAdminInicial(){
+  const nome=document.getElementById('setupNome').value.trim()||'Administrador';
+  const senha=document.getElementById('setupSenha').value;
+  const errEl=document.getElementById('setupError');
+  errEl.style.display='none';
+  if(senha.length<6){errEl.textContent='A senha deve ter ao menos 6 caracteres.';errEl.style.display='block';return;}
+  const btn=document.querySelector('#setupAdminForm .btn-primary');
+  btn.disabled=true;btn.textContent='Criando…';
+  try{
+    const email=toEmail(nome);
+    await createUserWithEmailAndPassword(fireAuth,email,senha);
+    // onAuthStateChanged vai cuidar do resto (salva metadados e entra no app)
+  }catch(e){
+    btn.disabled=false;btn.textContent='Criar e entrar';
+    errEl.textContent=e.code==='auth/email-already-in-use'?'Usuário já existe. Tente fazer login normalmente.':('Erro: '+e.message);
+    errEl.style.display='block';
   }
 }
 
@@ -185,14 +237,18 @@ async function aoAutenticar(firebaseUser){
   let usuarios=DB.get('usuarios')||[];
   let meta=usuarios.find(u=>u.email===email);
   if(!meta){
+    // Primeiro login deste usuário Firebase: cria os metadados automaticamente
     const nome=email.replace('@finpanel.local','').replace(/_/g,' ');
-    const nomeFmt=nome.charAt(0).toUpperCase()+nome.slice(1);
+    const nomeFmt=nome.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
     const newId=usuarios.length?Math.max(...usuarios.map(u=>u.id))+1:1;
-    meta={id:newId,nome:nomeFmt,email,perfil:usuarios.length===0?'admin':'usuario'};
+    const perfil=usuarios.length===0?'admin':'usuario'; // primeiro usuário sempre vira admin
+    meta={id:newId,nome:nomeFmt,email,perfil};
     usuarios.push(meta);
     await DB.set('usuarios',usuarios);
   }
   currentUser=meta;
+  // Marca setup como concluído (permite que a tela de login normal apareça para outros usuários)
+  try{await setDoc(doc(firestoreDB,'setup','status'),{inicializado:true,em:new Date().toISOString()});}catch{}
   entrarNoApp();
   Toast.show(`Bem-vindo, ${currentUser.nome}!`,'success');
 }
@@ -542,11 +598,29 @@ onAuthStateChanged(fireAuth,async(firebaseUser)=>{
   if(firebaseUser){
     await aoAutenticar(firebaseUser);
   }else{
+    // Não autenticado — verifica se é primeiro acesso verificando um doc público de setup
     const ls=document.getElementById('loginScreen');
     ls.style.display='flex';
     ls.classList.remove('hidden');
     document.getElementById('appWrapper').classList.remove('visible');
+    await verificarPrimeiroAcesso();
   }
 });
+
+/* Verifica se existe algum usuário cadastrado no sistema.
+   Usa um documento público /setup/status para saber se o sistema foi inicializado. */
+async function verificarPrimeiroAcesso(){
+  try{
+    const setupSnap=await getDoc(doc(firestoreDB,'setup','status'));
+    if(!setupSnap.exists()){
+      // Nunca foi inicializado — mostra tela de criação do admin
+      mostrarSetupAdmin();
+    }
+    // Se existe, login normal (formulário já está visível)
+  }catch(e){
+    // Sem permissão ou erro de rede — não mostra setup, deixa login normal
+    console.warn('Setup check failed:',e.message);
+  }
+}
 
 initUI();
