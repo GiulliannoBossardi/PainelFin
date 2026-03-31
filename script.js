@@ -7,12 +7,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBboODI6OWY-MkzeM2acgcXCu33_pGt5Ro",
-  authDomain: "painel-financeiro-316bc.firebaseapp.com",
-  projectId: "painel-financeiro-316bc",
-  storageBucket: "painel-financeiro-316bc.firebasestorage.app",
-  messagingSenderId: "237593887820",
-  appId: "1:237593887820:web:22071fd05bfee8822260e9"
+  apiKey:            "COLE_AQUI",
+  authDomain:        "COLE_AQUI",
+  projectId:         "COLE_AQUI",
+  storageBucket:     "COLE_AQUI",
+  messagingSenderId: "COLE_AQUI",
+  appId:             "COLE_AQUI"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
