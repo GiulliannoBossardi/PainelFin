@@ -77,7 +77,7 @@ function fazerLogin(){
   err.classList.remove('visible');
   currentUser=user;
   /* Salva sessão para sobreviver a F5 */
-  sessionStorage.setItem('fp_session',JSON.stringify({userId:user.id}));
+  sessionStorage.setItem('fp_session',JSON.stringify({userId:Number(user.id)}));
   entrarNoApp();
   Toast.show(`Bem-vindo, ${user.nome}!`,'success');
 }
@@ -112,7 +112,7 @@ function tentarRestaurarSessao(){
   if(!sess)return false;
   try{
     const{userId}=JSON.parse(sess);
-    const user=(DB.get('usuarios')||[]).find(u=>u.id===userId);
+    const user=(DB.get('usuarios')||[]).find(u=>u.id==userId);
     if(!user)return false;
     currentUser=user;
     return true;
