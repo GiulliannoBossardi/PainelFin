@@ -287,7 +287,7 @@
             <div class="stat-sub">Receitas − Despesas − Invest.</div>
           </div>
         </div>
-        <div class="grid-3" style="align-items:start;gap:20px;">
+        <div class="grid-2" style="align-items:start;gap:20px;">
           <div class="card">
             <div class="card-header"><div class="card-title">Receitas por Tipo</div><span class="card-badge" id="ctrlReceitasBadge">—</span></div>
             <div class="table-wrap">
@@ -313,27 +313,6 @@
                   <th onclick="sortCtrl('despesas','perc')" data-col="perc">% <span class="sort-icon">↕</span></th>
                 </tr></thead>
                 <tbody id="ctrlDespesasBody"></tbody>
-              </table>
-            </div>
-          </div>
-          <!-- ══ RESUMO POR TIPO ══ -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Resumo por Tipo</div>
-              <div class="flex-gap">
-                <span class="card-badge" id="ctrlResumoBadge">—</span>
-              </div>
-            </div>
-            <div class="text-muted" style="font-size:.76rem;padding:0 16px 10px;">Entradas, Saídas e Saldo por categoria · respeita filtros acima</div>
-            <div class="table-wrap">
-              <table id="ctrlResumoTable">
-                <thead><tr>
-                  <th>Tipo / Origem</th>
-                  <th style="text-align:right;">Entradas</th>
-                  <th style="text-align:right;">Saídas</th>
-                  <th style="text-align:right;">Saldo</th>
-                </tr></thead>
-                <tbody id="ctrlResumoBody"></tbody>
               </table>
             </div>
           </div>
@@ -372,18 +351,17 @@
           <span id="investFiltroLabel" class="filter-label-badge" style="display:none;"></span>
         </div>
         <div class="grid-3 mb-20">
-          <div class="stat-card invest"><div class="stat-label">Aportes no Período</div><div class="stat-value invest" id="investStatTotal">R$ 0,00</div><div class="stat-sub">Período filtrado</div></div>
-          <div class="stat-card red"><div class="stat-label">Retiradas no Período</div><div class="stat-value expense" id="investStatRetiradas">R$ 0,00</div><div class="stat-sub">Período filtrado</div></div>
-          <div class="stat-card green"><div class="stat-label">Patrimônio Líquido</div><div class="stat-value income" id="investStatPatrimonio">R$ —</div><div class="stat-sub">Aportes − Retiradas (total)</div></div>
+          <div class="stat-card invest"><div class="stat-label">Total Investido</div><div class="stat-value invest" id="investStatTotal">R$ 0,00</div><div class="stat-sub">Período filtrado</div></div>
+          <div class="stat-card green"><div class="stat-label">Patrimônio Total</div><div class="stat-value income" id="investStatPatrimonio">R$ —</div><div class="stat-sub">Todos os aportes</div></div>
+          <div class="stat-card blue"><div class="stat-label">Tipos Ativos</div><div class="stat-value neutral" id="investStatTipos">—</div><div class="stat-sub">Categorias cadastradas</div></div>
         </div>
         <div class="grid-2" style="align-items:start;">
           <div class="card">
-            <div class="card-header"><div class="card-title">Registros de Investimento</div><div class="flex-gap"><span class="card-badge" id="investBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:130px;padding:5px 10px;font-size:.78rem;" id="filterInvest" oninput="renderInvestTable()"/></div></div>
+            <div class="card-header"><div class="card-title">Aportes Registrados</div><div class="flex-gap"><span class="card-badge" id="investBadge">0 registros</span><input type="text" placeholder="Buscar..." style="width:130px;padding:5px 10px;font-size:.78rem;" id="filterInvest" oninput="renderInvestTable()"/></div></div>
             <div class="table-wrap" style="max-height:500px;">
               <table id="investTable">
                 <thead><tr>
                   <th onclick="sortInvest('ref')" data-col="ref">Ref. <span class="sort-icon">↕</span></th>
-                  <th onclick="sortInvest('operacao')" data-col="operacao">Operação <span class="sort-icon">↕</span></th>
                   <th onclick="sortInvest('tipo')" data-col="tipo">Tipo <span class="sort-icon">↕</span></th>
                   <th onclick="sortInvest('descricao')" data-col="descricao">Descrição <span class="sort-icon">↕</span></th>
                   <th onclick="sortInvest('valor')" data-col="valor">Valor <span class="sort-icon">↕</span></th>
@@ -403,12 +381,11 @@
             </div>
             <div class="form-grid single">
               <div class="form-group"><label>Referência (Mês/Ano)</label><input type="month" id="investRef"/></div>
-              <div class="form-group"><label>Operação</label><select id="investOperacao" onchange="onInvestOperacaoChange()"><option value="aporte">📈 Aporte</option><option value="retirada">📉 Retirada</option></select></div>
               <div class="form-group"><label>Tipo de Investimento</label><select id="investTipo"></select></div>
               <div class="form-group"><label>Descrição</label><input type="text" id="investDescricao" placeholder="Ex: Tesouro Direto, Ação PETR4..."/></div>
-              <div class="form-group"><label id="investValorLabel">Valor Aportado</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="investValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
+              <div class="form-group"><label>Valor Aportado</label><div class="currency-input-wrap"><span class="currency-prefix">R$</span><input type="text" id="investValor" placeholder="0.000,00" oninput="maskCurrency(this)"/></div></div>
             </div>
-            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" id="investBtnConfirmar" onclick="confirmarInsercaoInvest()" style="background:var(--invest);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="investBtnLabel">Confirmar Aporte</span></button></div>
+            <div style="margin-top:18px;"><button class="btn btn-primary btn-full" onclick="confirmarInsercaoInvest()" style="background:var(--invest);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar Aporte</button></div>
           </div>
         </div>
       </div>
@@ -500,7 +477,7 @@
 <div class="modal-overlay hidden" id="modalExcluirSalario"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Registro</div><button class="modal-close" onclick="closeModal('modalExcluirSalario')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;" id="deleteSalarioMsg"></p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirSalario')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoSalario()">Excluir</button></div></div></div>
 <div class="modal-overlay hidden" id="modalExcluirExtra"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Extra</div><button class="modal-close" onclick="closeModal('modalExcluirExtra')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir o registro <strong id="deleteExtraDesc" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirExtra')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoExtra()">Excluir</button></div></div></div>
 <div class="modal-overlay hidden" id="modalExcluirSaida"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Saída</div><button class="modal-close" onclick="closeModal('modalExcluirSaida')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir <strong id="deleteSaidaDesc" style="color:var(--text-primary);"></strong>? Todas as parcelas serão removidas.</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirSaida')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoSaida()">Excluir</button></div></div></div>
-<div class="modal-overlay hidden" id="modalExcluirInvest"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Registro</div><button class="modal-close" onclick="closeModal('modalExcluirInvest')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir o registro <strong id="deleteInvestDesc" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirInvest')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoInvest()">Excluir</button></div></div></div>
+<div class="modal-overlay hidden" id="modalExcluirInvest"><div class="modal"><div class="modal-header"><div class="modal-title">Excluir Aporte</div><button class="modal-close" onclick="closeModal('modalExcluirInvest')">✕</button></div><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.6;">Excluir o aporte <strong id="deleteInvestDesc" style="color:var(--text-primary);"></strong>?</p><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalExcluirInvest')">Cancelar</button><button class="btn btn-danger" onclick="confirmarExclusaoInvest()">Excluir</button></div></div></div>
 
 <script type="module" src="script.js"></script>
 </body>
