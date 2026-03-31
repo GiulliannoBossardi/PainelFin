@@ -149,6 +149,7 @@ tbody td{padding:10px 14px;color:var(--text-primary);vertical-align:middle;}
 .td-value-income{font-family:var(--font-mono);font-weight:500;color:var(--income);}
 .td-value-expense{font-family:var(--font-mono);font-weight:500;color:var(--expense);}
 .td-value-neutral{font-family:var(--font-mono);color:var(--text-primary);}
+.td-value-invest{font-family:var(--font-mono);font-weight:500;color:var(--invest);}
 .td-tag{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:99px;background:var(--bg-overlay);color:var(--text-secondary);font-family:var(--font-mono);}
 .empty-row td{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:.82rem;}
 
